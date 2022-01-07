@@ -1,6 +1,5 @@
 const {Schema, model} = require('mongoose');
 const {isEmail} = require('validator');
-// TODO date format?
 
 const UserSchema = new Schema(
   {
