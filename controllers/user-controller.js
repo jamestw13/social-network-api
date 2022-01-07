@@ -6,7 +6,8 @@ const UserController = {
   // GET all users
   getAllUsers(req, res) {
     User.find()
-      .then(dbUserData => {})
+      .select('-__v')
+      .then(dbUserData => res.json(dbUserData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -14,9 +15,18 @@ const UserController = {
   },
 
   // GET a single user by its _id and populated thought and friend data
-  getUserById(req, res) {
-    User.findOne()
-      .then(dbUserData => {})
+  getUserById({params}, res) {
+    User.findOne({_id: params.userId})
+      .populate({
+        path: 'friends',
+        select: '-__v',
+      })
+      .populate({
+        path: 'thoughts',
+        select: '-__v',
+      })
+      .select('-__v')
+      .then(dbUserData => res.json(dbUserData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -27,9 +37,9 @@ const UserController = {
   //   example data:
   //   {"username": "lernantino",
   //    "email": "lernantino@gmail.com"}
-  addUser(req, res) {
-    User.create()
-      .then(dbUserData => {})
+  addUser({body}, res) {
+    User.create(body)
+      .then(dbUserData => res.json(dbUserData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -37,9 +47,9 @@ const UserController = {
   },
 
   // PUT to update a user by its _id
-  updateUser(req, res) {
-    User.findOneAndUpdate()
-      .then(dbUserData => {})
+  updateUser({params, body}, res) {
+    User.findOneAndUpdate({_id: params.userId}, body, {new: true, runValidators: true})
+      .then(dbUserData => res.json(dbUserData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -47,9 +57,9 @@ const UserController = {
   },
 
   // DELETE to remove user by its _id
-  removeUser(req, res) {
-    User.findOneAndDelete()
-      .then(dbUserData => {})
+  removeUser({params}, res) {
+    User.findOneAndDelete({_id: params.userId})
+      .then(dbUserData => res.json(dbUserData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -60,9 +70,9 @@ const UserController = {
   // FRIENDS
 
   // POST to add a new friend to a user's friend list
-  addFriend(req, res) {
-    User.findOneAndUpdate()
-      .then(dbUserData => {})
+  addFriend({params}, res) {
+    User.findOneAndUpdate({_id: params.userId}, {$push: {friends: params.friendId}}, {new: true})
+      .then(dbUserData => res.json(dbUserData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -70,9 +80,9 @@ const UserController = {
   },
 
   // DELETE to remove a friend from a user's friend list
-  removeFriend(req, res) {
-    User.findOneAndUpdate()
-      .then(dbUserData => {})
+  removeFriend({params}, res) {
+    User.findOneAndUpdate({_id: params.userId}, {$pull: {friends: params.friendId}}, {new: true})
+      .then(dbUserData => res.json(dbUserData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
