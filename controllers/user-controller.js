@@ -49,6 +49,7 @@ const UserController = {
   // PUT to update a user by its _id
   updateUser({params, body}, res) {
     User.findOneAndUpdate({_id: params.userId}, body, {new: true, runValidators: true})
+      .select('-__v')
       .then(dbUserData => res.json(dbUserData))
       .catch(err => {
         console.log(err);
@@ -72,6 +73,7 @@ const UserController = {
   // POST to add a new friend to a user's friend list
   addFriend({params}, res) {
     User.findOneAndUpdate({_id: params.userId}, {$push: {friends: params.friendId}}, {new: true})
+      .select('-__v')
       .then(dbUserData => res.json(dbUserData))
       .catch(err => {
         console.log(err);
@@ -81,8 +83,13 @@ const UserController = {
 
   // DELETE to remove a friend from a user's friend list
   removeFriend({params}, res) {
+    console.log(params.userId, params.friendId);
     User.findOneAndUpdate({_id: params.userId}, {$pull: {friends: params.friendId}}, {new: true})
-      .then(dbUserData => res.json(dbUserData))
+      .select('-__v')
+      .then(dbUserData => {
+        console.log(dbUserData);
+        res.json(dbUserData);
+      })
       .catch(err => {
         console.log(err);
         res.status(400).json(err);

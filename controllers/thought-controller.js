@@ -6,7 +6,11 @@ const ThoughtController = {
   // GET to get all thoughts
   getAllThoughts(req, res) {
     Thought.find()
-      .then(dbUserData => {})
+      .populate({
+        path: 'reactions',
+      })
+      .select('-__v')
+      .then(dbThoughtData => res.json(dbThoughtData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -14,9 +18,14 @@ const ThoughtController = {
   },
 
   // GET to get a single thought by its _id
-  getThoughtById(req, res) {
-    Thought.findOne()
-      .then(dbUserData => {})
+  getThoughtById({params}, res) {
+    Thought.findOne({_id: params.thoughtId})
+      .select('-__v')
+      .populate({
+        path: 'reactions',
+        select: '-__v',
+      })
+      .then(dbThoughtData => res.json(dbThoughtData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -28,9 +37,10 @@ const ThoughtController = {
   // {"thoughtText": "Here's a cool thought...",
   //  "username": "lernantino",
   //  "userId": "5edff358a0fcb779aa7b118b"}
-  addThought(req, res) {
-    Thought.create()
-      .then(dbUserData => {})
+  addThought({body}, res) {
+    Thought.create(body)
+
+      .then(dbThoughtData => res.json(dbThoughtData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -38,9 +48,10 @@ const ThoughtController = {
   },
 
   // PUT to update a thought by its _id
-  updateThought(req, res) {
-    Thought.findOneAndUpdate()
-      .then(dbUserData => {})
+  updateThought({params, body}, res) {
+    Thought.findOneAndUpdate({_id: params.thoughtId}, body, {new: true})
+      .select('-__v')
+      .then(dbThoughtData => res.json(dbThoughtData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -48,9 +59,10 @@ const ThoughtController = {
   },
 
   // DELETE to remove a thought by its _id
-  removeThought(req, res) {
-    Thought.findOneAndDelete()
-      .then(dbUserData => {})
+  removeThought({params}, res) {
+    Thought.findOneAndDelete({_id: params.thoughtId})
+      .select('-__v')
+      .then(dbThoughtData => res.json(dbThoughtData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -60,9 +72,10 @@ const ThoughtController = {
   // REACTIONS
 
   // POST to create a reaction stored in a single thought's reactions array field
-  addReaction(req, res) {
-    Thought.findOneAndUpdate()
-      .then(dbUserData => {})
+  addReaction({params, body}, res) {
+    Thought.findOneAndUpdate({_id: params.thoughtId}, {$push: {reactions: body}}, {new: true})
+      .select('-__v')
+      .then(dbThoughtData => res.json(dbThoughtData))
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -70,9 +83,17 @@ const ThoughtController = {
   },
 
   // DELETE to pull and remove a reaction by the reaction's reactionId value
-  removeReaction(req, res) {
-    Thought.findOneAndUpdate()
-      .then(dbUserData => {})
+  removeReaction({params}, res) {
+    Thought.findOneAndUpdate(
+      {_id: params.thoughtId},
+      {$pull: {reactions: {reactionId: params.reactionId}}},
+      {new: true}
+    )
+      .select('-__v')
+      .then(dbThoughtData => {
+        console.log(dbThoughtData);
+        res.json(dbThoughtData);
+      })
       .catch(err => {
         console.log(err);
         res.status(400).json(err);
