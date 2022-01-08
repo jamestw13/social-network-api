@@ -21,3 +21,6 @@ The purpose of this project is to create a flexible NoSQL database for the backe
 - Mongoose.js
 - Express.js
 - validator.js
+
+## Walkthrough
+[Link to Walkthrough Video](https://github.com/jamestw13/social-network-api/blob/main/Social%20Network%20API%20-%20Walkthrough.mp4)
