@@ -56,7 +56,6 @@ const ThoughtController = {
     // Query collection for thoughts
     Thought.create(body)
       .then(dbThoughtData => {
-        console.log(body.userId, dbThoughtData);
         return User.findOneAndUpdate({_id: body.userId}, {$push: {thoughts: dbThoughtData._id}}, {new: true});
       })
       // Send back response
